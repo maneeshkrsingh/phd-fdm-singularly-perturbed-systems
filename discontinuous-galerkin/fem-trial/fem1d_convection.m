@@ -1,0 +1,88 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                    %
+%         Evaluate the finite element solution                       %
+%                                                                    %
+%                                                                    %
+%             -u''+u'=(pi^2)*sin(pi*x)+pi*cos(pi*x)                  %
+%               u(0)=u(1)=0                                          %
+%                                                                    %
+%                                                                    %
+%                                                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+clc;
+clear all; 
+close all; 
+%function U = fem1d(x)        
+M=16;                                    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+U_fem=zeros(M+1,1);
+U_exct=zeros(M+1,1);
+A =zeros(M-1,M-1); 
+F=zeros(M-1,1);  
+x=zeros(M+1,1);
+x2=zeros(M+1,1);
+h=zeros(M,1);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+x(1)=0;
+for i=1:M
+    h(i)=1/M;
+end
+for i=1:M
+  x(i+1) = x(i)+h(i);
+end
+
+% %%%%%%%%%%%%%%%%%%Sparse Matrix %%%%%%%%%
+ 
+for i=2:M-2
+  A(i,i-1)=-1/h(i)+1/2;
+  A(i,i) =  2/h(i);
+  A(i,i+1)   = - 1/h(i)+1/2;
+ 
+end
+
+ i=1;
+  A(i,i) =  2/h(i);
+  A(i,i+1)   = - 1/h(i)+1/2;
+     
+ i=M-1;   
+  A(i,i-1)=-1/h(i)+1/2;
+  A(i,i) =  2/h(i);
+
+  %%%%%%%%%%%%%%%%%%%%%%% Right hand Side %%%%%%%%%%%%%%
+for i=2:M-3,
+  
+  F(i)       = F(i) + int_hat2_f(x(i-1),x(i));
+  F(i+1)     = F(i+1) + int_hat1_f(x(i),x(i+1));
+end
+F(1) = int_hat1_f(x(1),x(2));
+F(M-1)     = F(M-1) + int_hat2_f(x(M-1),x(M));
+
+% for i=2:M
+%   
+%   F(i-1)       =  h(i)*((pi*pi)*sin(pi*x(i))+pi*cos(pi*x(i)));
+%  % F(i+1)     = F(i+1) + int_hat1_f(x(i),x(i+1));
+% end
+
+
+
+
+  U = A\F;
+
+  
+%%%%%%%%%%%%% Exact Solution %%%%%%%%%% 
+  for i=1:M+1
+   U_exct(i)=sin(pi*x(i));
+  end
+  
+  
+ U_fem(1)=0;
+ U_fem(M+1)=0;
+for i=1:M-1,
+  U_fem(i+1) = fem_soln(x,U,x(i));  % Compute FEM solution at x2(i)
+end
+  
+
+error = norm(U_fem-U_exct,inf);
+%plot(x,U_fem,'-.', x,U_exct) 
+%  return

@@ -1,0 +1,25 @@
+# MATLAB generated/binary files
+*.asv
+*.mat
+*.fig
+
+# Archives
+*.rar
+*.zip
+
+# Scilab files
+*.sci
+
+# Text output files
+*.txt
+
+# Executables
+*.exe
+
+# Other binary/output formats
+*.eps
+*.emf
+*.jpg
+*.pdf
+*.docx
+*.png
